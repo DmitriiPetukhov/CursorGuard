@@ -5,8 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CursorGuard"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Loaded="MainWindow_OnLoaded"
+        Closed="MainWindow_OnClosed"
+        Title="MainWindow" Height="350" Width="525"
+        DataContext="{Binding RelativeSource={RelativeSource Self}, Path=Model}">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
         
+        <TextBlock Text="{Binding FocusText}"></TextBlock>
+        <TextBlock Grid.Row="1" Text="{Binding ForegroundText}"></TextBlock>
+        <TextBlock Grid.Row="2" Text="{Binding Left}"></TextBlock>
+        <TextBlock Grid.Row="3" Text="{Binding Top}"></TextBlock>
+        <TextBlock Grid.Row="4" Text="{Binding Right}"></TextBlock>
+        <TextBlock Grid.Row="5" Text="{Binding Bottom}"></TextBlock>
+        <TextBlock Grid.Row="6" Text="{Binding ProcessId}"></TextBlock>
     </Grid>
 </Window>

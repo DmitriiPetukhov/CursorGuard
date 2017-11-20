@@ -54,6 +54,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\Ensure.cs" />
+    <Compile Include="ForegroundWindowInfo.cs" />
+    <Compile Include="ForegroundWindowMonitor.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Helpers\User32.cs" />
+    <Compile Include="WindowProcessLocator.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
