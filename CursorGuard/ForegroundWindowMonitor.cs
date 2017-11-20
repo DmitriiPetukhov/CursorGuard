@@ -7,7 +7,7 @@ namespace CursorGuard
 {
     internal class ForegroundWindowMonitor : IForegroundWindowMonitor
     {
-        public event Action<ForegroundWindowInfo> ForegroundWindowChanged;
+        public event Action<ForegroundWindowInfo> ForegroundWindowInfoUpdated;
 
         private Task monitoringTask;
         private CancellationTokenSource tokenSource;
@@ -26,7 +26,6 @@ namespace CursorGuard
 
             monitoringTask = Task.Run(() => MonitorWindows(token), token);
         }
-
         
         public void Dispose()
         {
@@ -52,7 +51,7 @@ namespace CursorGuard
 
         protected virtual void OnForegroundWindowChanged(ForegroundWindowInfo windowInfo)
         {
-            ForegroundWindowChanged?.Invoke(windowInfo);
+            ForegroundWindowInfoUpdated?.Invoke(windowInfo);
         }
 
         private void MonitorWindows(CancellationToken ct)
@@ -80,6 +79,9 @@ namespace CursorGuard
         }
     }
 
+    /// <summary>
+    /// Monitors and provides information about foreground window
+    /// </summary>
     public interface IForegroundWindowMonitor : IDisposable
     {
         /// <summary>
@@ -88,8 +90,8 @@ namespace CursorGuard
         void StartMonitoringAsync();
 
         /// <summary>
-        /// Fires when foreground window changed
+        /// Fires when window info is updated
         /// </summary>
-        event Action<ForegroundWindowInfo> ForegroundWindowChanged;
+        event Action<ForegroundWindowInfo> ForegroundWindowInfoUpdated;
     }
 }

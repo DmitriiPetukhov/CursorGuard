@@ -30,7 +30,7 @@ namespace CursorGuard
 
         public MainWindowModel Model { get; } = new MainWindowModel();
 
-        private void OnForegroundWindowChanged(ForegroundWindowInfo info)
+        private void OnForegroundWindowInfoUpdated(ForegroundWindowInfo info)
         {
             var processInfo = processLocator.GetProcessInfo(info);
 
@@ -44,12 +44,12 @@ namespace CursorGuard
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            monitor.ForegroundWindowChanged += OnForegroundWindowChanged;
+            monitor.ForegroundWindowInfoUpdated += OnForegroundWindowInfoUpdated;
         }
         
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
-            monitor.ForegroundWindowChanged -= OnForegroundWindowChanged;
+            monitor.ForegroundWindowInfoUpdated -= OnForegroundWindowInfoUpdated;
         }
     }
 

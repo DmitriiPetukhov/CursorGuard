@@ -16,8 +16,15 @@ namespace CursorGuard
         }
     }
 
+    /// <summary>
+    /// Provides process information
+    /// </summary>
     public interface IWindowProcessLocator
     {
+        /// <summary>
+        /// Gets process information by foreground window information
+        /// </summary>
+        /// <param name="windowInfo">Foreground window information</param>
         Process GetProcessInfo(ForegroundWindowInfo windowInfo);
     }
 }

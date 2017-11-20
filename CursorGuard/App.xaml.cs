@@ -27,7 +27,7 @@ namespace CursorGuard
         {
             InitializeTrayIcon();
             windowMonitor.StartMonitoringAsync();
-            windowMonitor.ForegroundWindowChanged += windowInfo =>
+            windowMonitor.ForegroundWindowInfoUpdated += windowInfo =>
             {
                 
             };
