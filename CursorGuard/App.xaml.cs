@@ -20,6 +20,8 @@ namespace CursorGuard
         private NotifyIcon trayIcon;
         private readonly IForegroundWindowMonitor windowMonitor = new ForegroundWindowMonitor();
         private readonly IWindowProcessLocator processLocator = new WindowProcessLocator();
+
+        private MainWindow mainWindow;
         
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
@@ -27,7 +29,7 @@ namespace CursorGuard
             windowMonitor.StartMonitoringAsync();
             windowMonitor.ForegroundWindowChanged += windowInfo =>
             {
-                Debug.WriteLine(windowInfo.Handle.ToString());
+                
             };
         }
 
@@ -47,9 +49,28 @@ namespace CursorGuard
             };
             trayIcon.ContextMenu = new ContextMenu(new[]
             {
+                new MenuItem("Options", DisplayOptionsWindow), 
+                new MenuItem("-"),
                 new MenuItem("Exit", (sender, args) => this.Shutdown()),
             });
             trayIcon.Visible = true;
+        }
+
+        private void DisplayOptionsWindow(object sender, EventArgs e)
+        {
+            if (this.mainWindow == null)
+            {
+                this.mainWindow = new MainWindow(windowMonitor, processLocator);
+                mainWindow.Closed += (o, args) =>
+                {
+                    this.mainWindow = null;
+                };
+                this.mainWindow.ShowDialog();
+            }
+            else
+            {
+                this.mainWindow.Activate();
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using CursorGuard.Annotations;
+using CursorGuard.Helpers;
 
 namespace CursorGuard
 {
@@ -11,35 +12,44 @@ namespace CursorGuard
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly IForegroundWindowMonitor monitor = new ForegroundWindowMonitor();
-        private readonly IWindowProcessLocator processLocator = new WindowProcessLocator();
+        private readonly IForegroundWindowMonitor monitor;
+        private readonly IWindowProcessLocator processLocator;
 
-        public MainWindow()
+        public MainWindow(
+            IForegroundWindowMonitor monitor,
+            IWindowProcessLocator processLocator)
         {
+            Ensure.ArgumentNotNull(monitor, nameof(monitor));
+            Ensure.ArgumentNotNull(processLocator, nameof(processLocator));
+
             InitializeComponent();
+            this.monitor = monitor;
+            this.processLocator = processLocator;
+
         }
 
         public MainWindowModel Model { get; } = new MainWindowModel();
 
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        private void OnForegroundWindowChanged(ForegroundWindowInfo info)
         {
-            monitor.ForegroundWindowChanged += info =>
-            {
-                var processInfo = processLocator.GetProcessInfo(info);
-                
-                this.Model.ForegroundText = info.Handle.ToString();
-                this.Model.Left = info.Left;
-                this.Model.Top = info.Top;
-                this.Model.Right = info.Right;
-                this.Model.Bottom = info.Bottom;
-                this.Model.ProcessId = processInfo.Id;
-            };
-            monitor.StartMonitoringAsync();
+            var processInfo = processLocator.GetProcessInfo(info);
+
+            this.Model.ForegroundText = info.Handle.ToString();
+            this.Model.Left = info.Left;
+            this.Model.Top = info.Top;
+            this.Model.Right = info.Right;
+            this.Model.Bottom = info.Bottom;
+            this.Model.ProcessId = processInfo.Id;
         }
 
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            monitor.ForegroundWindowChanged += OnForegroundWindowChanged;
+        }
+        
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
-            monitor.Dispose();
+            monitor.ForegroundWindowChanged -= OnForegroundWindowChanged;
         }
     }
 

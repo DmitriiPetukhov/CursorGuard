@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:CursorGuard"
              Startup="App_OnStartup"
-             Exit="App_OnExit">
+             Exit="App_OnExit"
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
          
     </Application.Resources>
