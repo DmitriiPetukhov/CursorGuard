@@ -24,7 +24,7 @@ namespace CursorGuard
             tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
 
-            monitoringTask = Task.Factory.StartNew(() => MonitorWindows(token), token);
+            monitoringTask = Task.Run(() => MonitorWindows(token), token);
         }
 
         
@@ -74,6 +74,8 @@ namespace CursorGuard
                     Right = rect.Right,
                     Bottom = rect.Bottom
                 });
+
+                Task.Delay(100, ct);
             }
         }
     }
