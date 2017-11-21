@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
 using Application = System.Windows.Application;
@@ -10,13 +11,15 @@ namespace CursorGuard
     /// </summary>
     public partial class App : Application
     {
-        private NotifyIcon trayIcon;
+        private const int windowBorder = 8;
+
         private readonly IForegroundWindowMonitor windowMonitor = new ForegroundWindowMonitor();
         private readonly IWindowProcessLocator processLocator = new WindowProcessLocator();
         private readonly IConfigurationManager configurationManager = new ConfigurationManager();
 
         private MainWindow mainWindow;
-        
+        private NotifyIcon trayIcon;
+
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             InitializeTrayIcon();
@@ -25,25 +28,24 @@ namespace CursorGuard
             windowMonitor.ForegroundWindowInfoUpdated += windowInfo =>
             {
                 var process = processLocator.GetProcessInfo(windowInfo);
-                string filePath;
-                try
+                ApplicationProfile profile = null;
+                if (process != null)
                 {
-                    filePath = process.MainModule.FileName;
+                    profile = configurationManager.GetProfileForExecutable(process.ExecutablePath);
                 }
-                catch (Exception ex)
+                
+                if (process == null || profile == null)
                 {
+                    // reset cursor clip
+                    Cursor.Clip = new Rectangle();
                     return;
                 }
 
-                var profile = configurationManager.GetProfileForExecutable(filePath);
-                if (profile == null)
-                {
-                    return;
-                }
-
-                Cursor.Position = new System.Drawing.Point(
-                    Math.Min(Math.Max(Cursor.Position.X, windowInfo.Left), windowInfo.Right),
-                    Math.Min(Math.Max(Cursor.Position.Y, windowInfo.Top), windowInfo.Bottom));
+                Cursor.Clip = new System.Drawing.Rectangle(
+                    new System.Drawing.Point(windowInfo.Left + windowBorder, windowInfo.Top),
+                    new System.Drawing.Size(
+                        windowInfo.Right - windowInfo.Left - windowBorder * 2,
+                        windowInfo.Bottom - windowInfo.Top - windowBorder));
             };
         }
 

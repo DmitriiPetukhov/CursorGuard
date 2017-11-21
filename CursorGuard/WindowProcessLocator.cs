@@ -1,18 +1,46 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Linq;
+using System.Management;
 using CursorGuard.Helpers;
 
 namespace CursorGuard
 {
     internal class WindowProcessLocator : IWindowProcessLocator
     {
-        public Process GetProcessInfo(ForegroundWindowInfo windowInfo)
+        public ProcessInfo GetProcessInfo(ForegroundWindowInfo windowInfo)
         {
             Ensure.ArgumentNotNull(windowInfo, nameof(windowInfo));
 
             User32.GetWindowThreadProcessId(windowInfo.Handle, out int processId);
+            var processExecutablePath = GetMainModuleFilepath(processId);
 
-            return Process.GetProcessById(processId);
+            if (processId == 0 || string.IsNullOrEmpty(processExecutablePath))
+            {
+                return null;
+            }
+
+            return new ProcessInfo
+            {
+                ProcessId = processId,
+                ExecutablePath = processExecutablePath
+            };
+        }
+
+        private string GetMainModuleFilepath(int processId)
+        {
+            string wmiQueryString = "SELECT ProcessId, ExecutablePath FROM Win32_Process WHERE ProcessId = " + processId;
+            using (var searcher = new ManagementObjectSearcher(wmiQueryString))
+            {
+                using (var results = searcher.Get())
+                {
+                    ManagementObject mo = results.Cast<ManagementObject>().FirstOrDefault();
+                    if (mo != null)
+                    {
+                        return (string)mo["ExecutablePath"];
+                    }
+                }
+            }
+            return null;
         }
     }
 
@@ -25,6 +53,13 @@ namespace CursorGuard
         /// Gets process information by foreground window information
         /// </summary>
         /// <param name="windowInfo">Foreground window information</param>
-        Process GetProcessInfo(ForegroundWindowInfo windowInfo);
+        ProcessInfo GetProcessInfo(ForegroundWindowInfo windowInfo);
+    }
+
+    public class ProcessInfo
+    {
+        public int ProcessId { get; set; }
+
+        public string ExecutablePath { get; set; }
     }
 }

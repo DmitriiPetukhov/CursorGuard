@@ -72,8 +72,6 @@ namespace CursorGuard
                     Right = rect.Right,
                     Bottom = rect.Bottom
                 });
-
-                Task.Delay(100, ct);
             }
         }
     }

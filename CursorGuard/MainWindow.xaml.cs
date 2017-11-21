@@ -39,7 +39,7 @@ namespace CursorGuard
             this.Model.Top = info.Top;
             this.Model.Right = info.Right;
             this.Model.Bottom = info.Bottom;
-            this.Model.ProcessId = processInfo.Id;
+            this.Model.ProcessId = processInfo.ProcessId;
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
