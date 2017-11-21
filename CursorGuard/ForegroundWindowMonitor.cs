@@ -34,11 +34,10 @@ namespace CursorGuard
                 return;
             }
 
-            tokenSource.Cancel();
-
             try
             {
-                monitoringTask.Wait();
+                tokenSource?.Cancel();
+                monitoringTask?.Wait();
             }
             catch (AggregateException)
             {
@@ -62,7 +61,7 @@ namespace CursorGuard
 
                 var foregroundHandle = User32.GetForegroundWindow();
 
-                User32.RECT rect = new User32.RECT();
+                var rect = new User32.RECT();
                 User32.GetWindowRect(foregroundHandle, ref rect);
 
                 OnForegroundWindowChanged(new ForegroundWindowInfo

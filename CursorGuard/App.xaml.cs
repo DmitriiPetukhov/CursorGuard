@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Navigation;
 using Application = System.Windows.Application;
 
 namespace CursorGuard
@@ -20,16 +13,37 @@ namespace CursorGuard
         private NotifyIcon trayIcon;
         private readonly IForegroundWindowMonitor windowMonitor = new ForegroundWindowMonitor();
         private readonly IWindowProcessLocator processLocator = new WindowProcessLocator();
+        private readonly IConfigurationManager configurationManager = new ConfigurationManager();
 
         private MainWindow mainWindow;
         
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             InitializeTrayIcon();
+
             windowMonitor.StartMonitoringAsync();
             windowMonitor.ForegroundWindowInfoUpdated += windowInfo =>
             {
-                
+                var process = processLocator.GetProcessInfo(windowInfo);
+                string filePath;
+                try
+                {
+                    filePath = process.MainModule.FileName;
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
+
+                var profile = configurationManager.GetProfileForExecutable(filePath);
+                if (profile == null)
+                {
+                    return;
+                }
+
+                Cursor.Position = new System.Drawing.Point(
+                    Math.Min(Math.Max(Cursor.Position.X, windowInfo.Left), windowInfo.Right),
+                    Math.Min(Math.Max(Cursor.Position.Y, windowInfo.Top), windowInfo.Bottom));
             };
         }
 

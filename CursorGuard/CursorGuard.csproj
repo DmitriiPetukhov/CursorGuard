@@ -56,6 +56,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ApplicationProfile.cs" />
+    <Compile Include="ConfigurationManager.cs" />
     <Compile Include="Helpers\Ensure.cs" />
     <Compile Include="ForegroundWindowInfo.cs" />
     <Compile Include="ForegroundWindowMonitor.cs" />

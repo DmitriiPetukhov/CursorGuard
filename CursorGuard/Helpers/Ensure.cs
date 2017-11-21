@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace CursorGuard.Helpers
 {
@@ -29,6 +30,41 @@ namespace CursorGuard.Helpers
             {
                 throw new ArgumentNullException(argumentName);
             }
+        }
+
+        public static void ArgumentNotNullOrEmptyString(string argument, string argumentName)
+        {
+            if (string.IsNullOrEmpty(argument))
+            {
+                throw new ArgumentException("Argument cannot be null or empty string", argumentName);
+            }
+        }
+
+        public static void ResultNotNull<T>(T result)
+        {
+            if (result == null)
+            {
+                throw new NullResultException();
+            }
+        }
+    }
+
+    public class NullResultException : Exception
+    {
+        public NullResultException() : base("Null in result where value is expected")
+        {
+        }
+
+        public NullResultException(string message) : base(message)
+        {
+        }
+
+        public NullResultException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected NullResultException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }
