@@ -58,7 +58,7 @@ namespace CursorGuard
                 {
                     var configModel = (SerializableConfiguration) serializer.Deserialize(fs);
 
-                    profiles = new Dictionary<string, ApplicationProfile>();
+                    profiles = new Dictionary<string, ApplicationProfile>(StringComparer.InvariantCultureIgnoreCase);
                     foreach (var profile in configModel.ApplicationProfiles)
                     {
                         profiles.Add(profile.ExecutablePath, ApplicationProfileFromSerializable(profile));
