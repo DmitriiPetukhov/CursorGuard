@@ -33,6 +33,10 @@ namespace CursorGuard
         private void OnForegroundWindowInfoUpdated(ForegroundWindowInfo info)
         {
             var processInfo = processLocator.GetProcessInfo(info);
+            if (processInfo == null)
+            {
+                return;
+            }
 
             this.Model.ForegroundText = info.Handle.ToString();
             this.Model.Left = info.Left;

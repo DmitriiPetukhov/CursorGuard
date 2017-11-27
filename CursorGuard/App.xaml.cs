@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
@@ -18,6 +19,7 @@ namespace CursorGuard
         private readonly IConfigurationManager configurationManager = new ConfigurationManager();
 
         private MainWindow mainWindow;
+        private OptionsWindow optionsWindow;
         private NotifyIcon trayIcon;
 
         private void App_OnStartup(object sender, StartupEventArgs e)
@@ -36,11 +38,14 @@ namespace CursorGuard
                 
                 if (process == null || profile == null)
                 {
+                    Debug.WriteLine("Process: " + process?.ExecutablePath);
+                    Debug.WriteLine("No process or profile. Resetting clipping.");
                     // reset cursor clip
                     Cursor.Clip = new Rectangle();
                     return;
                 }
 
+                Debug.WriteLine("Setting window clipping.");
                 Cursor.Clip = new System.Drawing.Rectangle(
                     new System.Drawing.Point(windowInfo.Left + windowBorder, windowInfo.Top),
                     new System.Drawing.Size(
@@ -65,7 +70,8 @@ namespace CursorGuard
             };
             trayIcon.ContextMenu = new ContextMenu(new[]
             {
-                new MenuItem("Options", DisplayOptionsWindow), 
+                new MenuItem("Options", DisplayOptionsWindow),
+                new MenuItem("Debug", DisplayDebugWindow), 
                 new MenuItem("-"),
                 new MenuItem("Exit", (sender, args) => this.Shutdown()),
             });
@@ -74,17 +80,48 @@ namespace CursorGuard
 
         private void DisplayOptionsWindow(object sender, EventArgs e)
         {
+            if (this.optionsWindow == null)
+            {
+                EventHandler windowClosedHandler = null;
+                windowClosedHandler = (o, args) =>
+                {
+                    this.optionsWindow.Closed -= windowClosedHandler;
+                    this.optionsWindow = null;                    
+                };
+
+                this.optionsWindow = new OptionsWindow(configurationManager);
+                this.optionsWindow.Closed += windowClosedHandler;
+                this.optionsWindow.ShowDialog();
+            }
+            else
+            {
+                if (this.optionsWindow.WindowState == WindowState.Minimized)
+                    this.optionsWindow.WindowState = WindowState.Normal;
+
+                this.optionsWindow.Activate();
+            }
+        }
+
+        private void DisplayDebugWindow(object sender, EventArgs e)
+        {
             if (this.mainWindow == null)
             {
-                this.mainWindow = new MainWindow(windowMonitor, processLocator);
-                mainWindow.Closed += (o, args) =>
+                EventHandler windowClosedHandler = null;
+                windowClosedHandler = (o, args) =>
                 {
-                    this.mainWindow = null;
+                    this.mainWindow.Closed -= windowClosedHandler;
+                    this.mainWindow = null;                    
                 };
+
+                this.mainWindow = new MainWindow(windowMonitor, processLocator);
+                this.mainWindow.Closed += windowClosedHandler;
                 this.mainWindow.ShowDialog();
             }
             else
             {
+                if (this.mainWindow.WindowState == WindowState.Minimized)
+                    this.mainWindow.WindowState = WindowState.Normal;
+
                 this.mainWindow.Activate();
             }
         }
